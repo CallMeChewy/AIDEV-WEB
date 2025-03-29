@@ -1,0 +1,85 @@
+# _config.yml
+# Jekyll configuration for AIDEV-WEB documentation
+# Author: Claude (Anthropic), as part of Project Himalaya
+
+# Site settings
+title: AIDEV-WEB
+description: >-
+  Web interface and documentation system for Project Himalaya,
+  demonstrating optimal AI-human collaboration.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://projecthimalaya.com" # Replace with actual domain when available
+github_username: CallMeChewy
+repository: CallMeChewy/ProjectHimalaya
+
+# Build settings
+markdown: kramdown
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-redirect-from
+
+# Theme settings (using Just the Docs)
+color_scheme: himalaya
+search_enabled: true
+search:
+  heading_level: 3
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\\s/]+/ # Correctly escaped backslash for \s
+  rel_url: true
+  button: false
+
+# Aux links for the upper right navigation
+aux_links:
+  "Project Himalaya on GitHub":
+    - "//github.com/CallMeChewy/ProjectHimalaya"
+
+# Footer content
+footer_content: "Copyright &copy; 2025 Herbert J. Bowers. Distributed under an MIT license."
+
+# Collections for documentation structure
+collections:
+  docs:
+    permalink: "/:collection/:path/"
+    output: true
+  components:
+    permalink: "/:collection/:path/"
+    output: true
+  standards:
+    permalink: "/:collection/:path/"
+    output: true
+
+# Default front matter settings
+defaults:
+  - scope:
+      path: ""
+      type: docs
+    values:
+      layout: default
+      nav_order: 1
+  - scope:
+      path: ""
+      type: components
+    values:
+      layout: default
+      nav_order: 2
+  - scope:
+      path: ""
+      type: standards
+    values:
+      layout: default
+      nav_order: 3
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: default
+      nav_order: 4
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"

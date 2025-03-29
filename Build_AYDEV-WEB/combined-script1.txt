@@ -1,0 +1,308 @@
+#!/usr/bin/env python3
+# File: himalaya_website.py
+# Path: ProjectHimalaya/himalaya_website.py
+# Standard: AIDEV-PascalCase-1.6
+# Created: 2025-03-28
+# Last Modified: 2025-03-28  3:45PM
+# Description: Complete website management script for Project Himalaya
+
+"""
+Project Himalaya Website Management Script
+
+This script provides a comprehensive tool for managing the Project Himalaya website.
+It handles configuration generation, setup, and deployment of the GitHub Pages website.
+"""
+
+import os
+import sys
+import json
+import yaml
+import shutil
+import argparse
+import subprocess
+from pathlib import Path
+from datetime import datetime
+import re
+
+class HimalayaWebsite:
+    """Comprehensive management tool for Project Himalaya website."""
+    
+    def __init__(self, RepoDir: str, Config: dict = None):
+        """Initialize the website management tool."""
+        self.RepoDir = Path(RepoDir)
+        self.DocsDir = self.RepoDir / "docs"
+        self.GithubDir = self.RepoDir / ".github" / "workflows"
+        self.ArtifactsDir = self.RepoDir / "artifacts"
+        self.ArtifactsDir.mkdir(parents=True, exist_ok=True)
+        
+        # Default configuration if none provided
+        self.Config = Config or {
+            "title": "Project Himalaya",
+            "description": "A comprehensive framework for AI-human collaborative development",
+            "url": "https://projecthimalaya.com",
+            "repository": "CallMeChewy/ProjectHimalaya",
+            "author": "Herbert J. Bowers",
+            "theme": "just-the-docs",
+            "primary_color": "#4575b4"
+        }
+        
+        self.Timestamp = datetime.now().strftime("%B %d, %Y  %I:%M%p")
+        self.Date = datetime.now().strftime("%Y-%m-%d")
+    
+    def RunCommand(self, Command: list, Cwd: Path = None) -> tuple:
+        """Run a shell command and return the output."""
+        try:
+            Process = subprocess.Popen(
+                Command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=str(Cwd or self.RepoDir)
+            )
+            Stdout, Stderr = Process.communicate()
+            return Process.returncode, Stdout.decode('utf-8'), Stderr.decode('utf-8')
+        except Exception as Ex:
+            return 1, "", str(Ex)
+    
+    #
+    # Configuration Generation
+    #
+    
+    def GenerateJekyllConfig(self) -> str:
+        """Generate Jekyll _config.yml file."""
+        print("Generating Jekyll configuration...")
+        
+        ConfigData = {
+            "title": self.Config["title"],
+            "description": self.Config["description"],
+            "baseurl": "",
+            "url": self.Config["url"],
+            "github_username": self.Config["repository"].split("/")[0],
+            "repository": self.Config["repository"],
+            "markdown": "kramdown",
+            "remote_theme": "just-the-docs/just-the-docs",
+            "plugins": [
+                "jekyll-feed",
+                "jekyll-seo-tag",
+                "jekyll-sitemap",
+                "jekyll-redirect-from"
+            ],
+            "color_scheme": "himalaya",
+            "search_enabled": True,
+            "search": {
+                "heading_level": 3,
+                "previews": 3,
+                "preview_words_before": 5,
+                "preview_words_after": 10,
+                "tokenizer_separator": r"/[\s/]+/",
+                "rel_url": True,
+                "button": False
+            },
+            "aux_links": {
+                f"{self.Config['title']} on GitHub": [
+                    f"//github.com/{self.Config['repository']}"
+                ]
+            },
+            "footer_content": f"Copyright &copy; {datetime.now().year} {self.Config['author']}. Distributed under an MIT license.",
+            "collections": {
+                "docs": {
+                    "permalink": "/:collection/:path/",
+                    "output": True
+                },
+                "components": {
+                    "permalink": "/:collection/:path/",
+                    "output": True
+                },
+                "standards": {
+                    "permalink": "/:collection/:path/",
+                    "output": True
+                }
+            },
+            "defaults": [
+                {
+                    "scope": {
+                        "path": "",
+                        "type": "docs"
+                    },
+                    "values": {
+                        "layout": "default",
+                        "nav_order": 1
+                    }
+                },
+                {
+                    "scope": {
+                        "path": "",
+                        "type": "components"
+                    },
+                    "values": {
+                        "layout": "default",
+                        "nav_order": 2
+                    }
+                },
+                {
+                    "scope": {
+                        "path": "",
+                        "type": "standards"
+                    },
+                    "values": {
+                        "layout": "default",
+                        "nav_order": 3
+                    }
+                },
+                {
+                    "scope": {
+                        "path": "",
+                        "type": "pages"
+                    },
+                    "values": {
+                        "layout": "default",
+                        "nav_order": 4
+                    }
+                }
+            ],
+            "back_to_top": True,
+            "back_to_top_text": "Back to top",
+            "ga_tracking": "",
+            "ga_tracking_anonymize_ip": True
+        }
+        
+        Content = "# _config.yml\n"
+        Content += "# Jekyll configuration for Project Himalaya website\n\n"
+        Content += "# Site settings\n"
+        Content += yaml.dump(ConfigData, sort_keys=False, default_flow_style=False)
+        
+        OutputPath = self.ArtifactsDir / "_config.yml"
+        with open(OutputPath, 'w') as f:
+            f.write(Content)
+        
+        print(f"  Created: {OutputPath}")
+        return str(OutputPath)
+    
+    def GenerateGemfile(self) -> str:
+        """Generate Gemfile for Ruby dependencies."""
+        print("Generating Gemfile...")
+        
+        Content = """source "https://rubygems.org"
+
+# Jekyll and plugins
+gem "jekyll", "~> 4.3.2"
+gem "webrick", "~> 1.8"  # Required for Ruby >= 3.0
+gem "just-the-docs"      # Documentation theme
+
+# Jekyll plugins
+group :jekyll_plugins do
+  gem "jekyll-feed", "~> 0.17.0"
+  gem "jekyll-seo-tag", "~> 2.8.0"
+  gem "jekyll-sitemap", "~> 1.4.0"
+  gem "jekyll-redirect-from", "~> 0.16.0"
+end
+
+# Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
+# and associated library.
+platforms :mingw, :x64_mingw, :mswin, :jruby do
+  gem "tzinfo", ">= 1", "< 3"
+  gem "tzinfo-data"
+end
+
+# Performance-booster for watching directories on Windows
+gem "wdm", "~> 0.1.1", :platforms => [:mingw, :x64_mingw, :mswin]
+
+# Lock `http_parser.rb` gem to `v0.6.x` on JRuby builds since newer versions of the gem
+# do not have a Java counterpart.
+gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
+"""
+        
+        OutputPath = self.ArtifactsDir / "Gemfile"
+        with open(OutputPath, 'w') as f:
+            f.write(Content)
+        
+        print(f"  Created: {OutputPath}")
+        return str(OutputPath)
+    
+    def GenerateGitHubWorkflow(self) -> str:
+        """Generate GitHub Actions workflow file."""
+        print("Generating GitHub Actions workflow...")
+        
+        Content = """name: Build and deploy Jekyll site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+          working-directory: docs
+      
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v3
+      
+      - name: Build site
+        run: |
+          cd docs
+          bundle install
+          bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: "docs/_site"
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+"""
+        
+        OutputPath = self.ArtifactsDir / "github-workflow.yml"
+        with open(OutputPath, 'w') as f:
+            f.write(Content)
+        
+        print(f"  Created: {OutputPath}")
+        return str(OutputPath)
+    
+    def GenerateHomepage(self) -> str:
+        """Generate homepage content."""
+        print("Generating homepage...")
+        
+        Content = """---
+layout: home
+title: Project Himalaya
+nav_order: 1
+description: "A comprehensive framework for AI-human collaborative development"
+permalink: /
+---
+
+# Project Himalaya
+{: .fs-9 }
+
+A comprehensive framework demonstrating optimal AI-human collaboration, manifested through the

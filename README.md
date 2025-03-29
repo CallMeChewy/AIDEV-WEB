@@ -1,34 +1,64 @@
-# Project Himalaya
+# AIDEV-WEB
+**Created: 2025-03-28**
+**Last Modified: 2025-03-28  08:48PM**
 
-A comprehensive framework demonstrating optimal AI-human collaboration, manifested through the development of practical applications that themselves leverage AI capabilities.
+[Context: Project_Overview]
+[Status: Active]
+[Version: 1.0]
+[Author: Claude (Anthropic), as part of Project Himalaya]
+
+## Project Overview
+
+AIDEV-WEB is a component of Project Himalaya, focused on creating a web interface and documentation system for AI-human collaborative development.
+
+### Key Features
+
+- 🌐 **Documentation Website**: Jekyll-based site for project documentation
+- 📚 **Component Showcase**: Visual representation of project components
+- 🔄 **Development Blog**: Updates on project progress
+- 🧪 **Integration Testing**: Web-based testing of components
 
 ## Attribution
 
-Project Himalaya is a collaborative effort between:
+AIDEV-WEB is developed as part of Project Himalaya, a collaborative effort between:
 
 - **Herbert J. Bowers** (Project Creator and Director)
 - **Claude** (Anthropic) - AI Assistant responsible for 99.99% of code and technical design
 
 This project demonstrates the potential of AI-human collaboration by combining human vision and direction with AI implementation capabilities.
 
-## Project Vision
+## Getting Started
 
-Project Himalaya aims to create a comprehensive framework for AI-human collaborative development while building practical applications like the OllamaModelEditor. The project follows a layered architecture with a focus on documentation-driven development and knowledge persistence.
+See the [INSTALL.md](INSTALL.md) file for setup instructions.
 
-### Key Features
+## Project Structure
 
-- 📚 **Documentation-Driven Development**: Documentation precedes implementation
-- 🧩 **Modular Architecture**: Clear separation of concerns with no module exceeding 500 lines
-- 🔄 **Knowledge Persistence**: Mechanisms for maintaining context across development sessions
-- 🧪 **Systematic Testing**: Comprehensive testing integrated from the beginning
-- 🤝 **AI-Human Collaboration**: Optimized workflow between human creativity and AI capabilities
+```
+AIDEV-WEB/
+├── .venv/                  # Python virtual environment
+├── docs/                   # Jekyll-based documentation site
+│   ├── _components/        # Component documentation
+│   ├── _docs/              # General documentation
+│   ├── _layouts/           # Page templates
+│   ├── assets/             # Static assets
+│   └── ...                 # Other Jekyll directories
+├── src/                    # Source code
+├── tests/                  # Test files
+├── scripts/                # Utility scripts
+├── templates/              # File templates
+├── requirements.txt        # Python dependencies
+└── activate_venv.py        # Virtual environment helper
+```
 
-## Repository Status
+## Development Workflow
 
-This repository is currently being initialized with a clean structure. More documentation and code will be added soon.
+1. Activate virtual environment
+2. Make changes to code or documentation
+3. Test changes locally
+4. Deploy to GitHub Pages
 
 ---
 
 *"Code is not merely functional—it is a visual medium that developers interact with for extended periods. The choices made in these standards prioritize the axis of symmetry, character distinction, readability at scale, and visual hierarchy."*
 
-— Herbert J. Bowers, Project Creator
+— Herbert J. Bowers
