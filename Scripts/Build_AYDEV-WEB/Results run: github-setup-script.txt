@@ -1,0 +1,32 @@
+/bin/python3 /home/herb/Desktop/AIDEV-WEB/github-setup-script.py
+herb@herb:~/Desktop/AIDEV-WEB$ /bin/python3 /home/herb/Desktop/AIDEV-WEB/github-setup-script.py
+Setting up GitHub repository for /home/herb/Desktop/AIDEV-WEB
+Initializing Git repository in /home/herb/Desktop/AIDEV-WEB...
+  Directory is already a Git repository
+  .gitignore file already exists
+Staging files...
+  Files staged successfully
+Creating initial commit...
+  Initial commit created successfully
+Setting up remote origin...
+  Remote 'origin' already exists, updating URL
+  Remote origin set to: git@github.com:CallMeChewy/AIDEV-WEB.git
+Checking if GitHub repository 'CallMeChewy/AIDEV-WEB' exists...
+  Repository exists on GitHub.
+
+Push to GitHub repository 'CallMeChewy/AIDEV-WEB'? (y/n): y
+Pushing to GitHub...
+  Successfully pushed to GitHub
+
+Repository available at: https://github.com/CallMeChewy/AIDEV-WEB
+
+GitHub repository setup complete!
+Repository URL: https://github.com/CallMeChewy/AIDEV-WEB
+
+Next steps:
+1. Configure GitHub Pages in repository settings
+2. Wait for GitHub Actions to build and deploy the website
+3. Website will be available at:
+   https://CallMeChewy.github.io/AIDEV-WEB/
+   (or at your custom domain if configured)
+herb@herb:~/Desktop/AIDEV-WEB$ 
