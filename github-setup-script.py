@@ -26,17 +26,18 @@ class GitHubSetup:
     """Handles the setup and initialization of a GitHub repository."""
     
     def __init__(self, ProjectDir: Optional[str] = None, 
-                 RepoName: str = "ProjectHimalaya",
+                 RepoName: Optional[str] = None,
                  Username: str = "CallMeChewy"):
         """Initialize the GitHub setup tool.
         
         Args:
             ProjectDir: Path to the project directory (default: current directory)
-            RepoName: GitHub repository name (default: "ProjectHimalaya")
+            RepoName: GitHub repository name (default: name of ProjectDir)
             Username: GitHub username (default: "CallMeChewy")
         """
         self.ProjectDir = Path(ProjectDir).resolve() if ProjectDir else Path.cwd().resolve()
-        self.RepoName = RepoName
+        # Default RepoName to the project directory's name if not provided
+        self.RepoName = RepoName if RepoName else self.ProjectDir.name
         self.Username = Username
         self.GitDir = self.ProjectDir / ".git"
         
@@ -263,7 +264,34 @@ logs/
         
         print(f"  Remote origin set to: {RemoteUrl}")
         return True
-    
+
+    def CheckRemoteRepositoryExists(self) -> bool:
+        """Check if the remote repository exists on GitHub using 'gh cli'.
+        
+        Returns:
+            True if the repository exists, False otherwise.
+        """
+        print(f"Checking if GitHub repository '{self.Username}/{self.RepoName}' exists...")
+        
+        # Use 'gh repo view' which returns 0 if repo exists, non-zero otherwise
+        Command = ["gh", "repo", "view", f"{self.Username}/{self.RepoName}"]
+        ReturnCode, Stdout, Stderr = self.RunCommand(Command)
+        
+        if ReturnCode == 0:
+            print("  Repository exists on GitHub.")
+            return True
+        else:
+            # Check if the error is specifically 'Could not resolve to a Repository'
+            if "Could not resolve to a Repository" in Stderr:
+                 print(f"  Error: Repository '{self.Username}/{self.RepoName}' not found on GitHub or you lack permissions.")
+                 print("  Please create the repository manually on GitHub first.")
+            elif "gh: command not found" in Stderr or "No such file or directory" in Stderr:
+                 print("  Error: GitHub CLI ('gh') not found. Cannot verify repository existence.")
+                 print("  Please install 'gh' or ensure it's in your PATH.")
+            else:
+                 print(f"  Error checking repository existence: {Stderr}")
+            return False
+
     def PushToGitHub(self, Force: bool = False) -> bool:
         """Push to GitHub repository.
         
@@ -359,6 +387,10 @@ logs/
         # Setup remote
         if not self.SetupRemote():
             return False
+
+        # Verify remote repository exists before attempting push
+        if not self.CheckRemoteRepositoryExists():
+             return False
         
         # Ask for confirmation before pushing to GitHub
         if not Force:
@@ -384,9 +416,9 @@ logs/
 
 def main():
     """Main entry point for the script."""
-    Parser = argparse.ArgumentParser(description="Set up GitHub repository for Project Himalaya")
-    Parser.add_argument("--dir", dest="ProjectDir", default=".", help="Project directory")
-    Parser.add_argument("--repo", dest="RepoName", default="ProjectHimalaya", help="GitHub repository name")
+    Parser = argparse.ArgumentParser(description="Set up GitHub repository")
+    Parser.add_argument("--dir", dest="ProjectDir", default=".", help="Project directory (default: current)")
+    Parser.add_argument("--repo", dest="RepoName", help="GitHub repository name (default: project directory name)")
     Parser.add_argument("--user", dest="Username", default="CallMeChewy", help="GitHub username")
     Parser.add_argument("--name", dest="GitName", help="Git user name")
     Parser.add_argument("--email", dest="GitEmail", help="Git user email")
